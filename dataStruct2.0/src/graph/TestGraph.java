@@ -50,6 +50,13 @@ public class TestGraph {
 				res.get(i).print();
 			
 			}
+			System.out.println("bellmanFord:");
+			res=diGraph.bellmanFord(v0);
+			for(int i=0;i<res.size();i++){
+				System.out.print(characters[v0]+"->"+characters[i]+":");
+				res.get(i).print();
+			
+			}
 			System.out.println("floyd:");
 			List<List<List<Character>>> res2=diGraph.floyd();
 			for(int i=0;i<res2.size();i++){
@@ -80,6 +87,16 @@ public class TestGraph {
 		System.out.println();
 		System.out.println("bfs:");
 		unDiGraph.breadthFirstSearch(visit);
+		System.out.println();
+		
+		System.out.println("heap dijstra:");
+		int v0=2;
+		List<List<Character>> res=diGraph.dijkstra(v0);
+		for(int i=0;i<res.size();i++){
+			System.out.print(characters[v0]+"->"+characters[i]+":");
+			res.get(i).print();
+		
+		}
 		System.out.println();
 		
 		System.out.println("prim:");

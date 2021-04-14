@@ -103,14 +103,9 @@ public class UnDiGraph<E> implements Graph<E>{
 	 * @return 节点v相连的边，包括节点下标和权重
 	 */
 	private List<EdgeData> getNeighbours(int v){
-		try {
-			return edges.get(v);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new SeqList<>();
+		return edges.get(v);
 	}
-
+	
 	public void depthFirstSearch(Visit visit){
 		boolean[] visited=new boolean[numberOfVertice()];
 		for(int i=0;i<numberOfVertice();i++){
@@ -157,6 +152,81 @@ public class UnDiGraph<E> implements Graph<E>{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	/**
+	 * 堆优化最短路径
+	 * @param v0
+	 * @return
+	 */
+	public List<List<E>> dijstra(int v0) {
+		Section[] sections = new Section[numberOfVertice()];
+		for (int i = 0; i < numberOfVertice(); i++) {
+			if (i == v0) {
+				sections[i] = new Section(i, true, -1, 0);
+			} else {
+				sections[i] = new Section(i, false, v0, getWeight(v0, i));
+			}
+		}
+		
+		//存储v0到该节点路径的信息
+		PriorityQueue<Section> heap = new PriorityQueue<>(numberOfVertice(), new Comparator<Section>() {
+
+			@Override
+			public int compare(Section o1, Section o2) {
+				return o1.distance-o2.distance < 0 ? -1 : 1;
+			}
+		});
+		for (int i = 0; i < numberOfVertice(); i++) {
+			if (i != v0) {
+				heap.add(sections[i]);
+			}
+		}
+		
+		while (!heap.isEmpty()) {
+			Section cur = heap.poll();
+			cur.known = true;
+			int start = cur.id;
+			
+			List<EdgeData> neighbours = getNeighbours(start);
+			for (int i = 0; i < neighbours.size(); i++) {
+				EdgeData neighbour = neighbours.get(i);
+				int next = neighbour.v2;
+				if (!sections[next].known && 
+						cur.distance + neighbour.weight < sections[next].distance) {
+					heap.remove(sections[next]);
+					sections[next].distance = cur.distance + neighbour.weight;
+					sections[next].pre = start;
+					heap.add(sections[next]);
+				}
+			}
+		}
+		
+		List<List<E>> res = new SeqList<>(numberOfVertice());
+		transformSections(sections, res);
+		return res;
+	}
+	/**
+	 * 将最短路径信息转化为最短路径上点的列表
+	 * @param sections
+	 * @param res
+	 */
+	private void transformSections(Section[] sections, List<List<E>> res) {
+		for(int i=0;i<numberOfVertice();i++){
+			List<E> temp=new SeqList<>();
+			if (sections[i].distance!=MAX_WEIGHT) {
+				//v0到cur有路径
+				for(int cur=i;cur!=-1;cur=sections[cur].pre){
+					temp.add(getVertex(cur));
+				}
+			}
+			//将v0为终点的路径反向输出为v0为起点的路径
+			List<E> path=new SeqList<>();
+			for(int j=temp.size()-1;j>=0;j--){
+				path.add(temp.get(j));
+			}
+			res.add(path);
 		}
 	}
 	/**
@@ -362,6 +432,28 @@ public class UnDiGraph<E> implements Graph<E>{
 		}
 		public void print(){
 			System.out.println(v1+"-"+v2+":"+weight);
+		}
+	}
+	/**
+	 * 堆优化dijkstra中储存路段信息
+	 * @author hjg
+	 *
+	 */
+	public static class Section{
+		private int id;
+		private boolean known;
+		private int pre;
+		private double distance;
+		/**
+		 * @param known 是否已知到该节点的最短路径
+		 * @param pre 最短路径上的前置节点,-1表示为v0，没有前置节点
+		 * @param distance v0到该节点的距离
+		 */
+		public Section(int id,boolean known,int pre,double distance){
+			this.id=id;
+			this.known=known;
+			this.pre=pre;
+			this.distance=distance;
 		}
 	}
 

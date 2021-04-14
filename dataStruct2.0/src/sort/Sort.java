@@ -67,7 +67,7 @@ public class Sort {
 		int pivot=a[end];//pivot储存在最后一个位置
 		int i=begin-1,j=end;
 		while(i<j){
-			while(i<j&&a[++i]<pivot) {}//i右移，移过<pivot的元素，停在>=pivot元素
+			while(a[++i]<pivot) {}//i右移，移过<pivot的元素，停在>=pivot元素
 			while(i<j&&a[--j]>pivot) {};//j左移，移过>pivot的元素，停在<=pivot元素
 			if (i<j) {
 				swap(a, i, j);
@@ -89,7 +89,7 @@ public class Sort {
 			int i=begin,j=end-1;
 			while(i<j){
 				while(a[++i]<pivot){}//i右移，移过小于pivot的元素，停在>=pivot的位置
-				while(a[--j]>pivot){}//i左移，移过大于pivot的元素，停在<=pivot的位置
+				while(i<j&&a[--j]>pivot){}//i左移，移过大于pivot的元素，停在<=pivot的位置
 				if (i<j) {
 					swap(a, i, j);
 				}

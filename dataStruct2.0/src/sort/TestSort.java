@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class TestSort {
 	public static void main(String[] args) {
-		int n=50000;
+		int n=50;
 		Random random=new Random();
 		int[] a=new int[n];
 		for(int i=0;i<a.length;i++){
@@ -17,7 +17,9 @@ public class TestSort {
 		System.out.println("insert:");
 		test=Arrays.copyOf(a, a.length);
 		begin=System.currentTimeMillis();
+		Sort.print(test);
 		Sort.insertSort(test);
+		Sort.print(test);
 		System.out.println(System.currentTimeMillis()-begin);
 
 		System.out.println("bubble:");
@@ -35,13 +37,17 @@ public class TestSort {
 		System.out.println("quick base:");
 		test=Arrays.copyOf(a, a.length);
 		begin=System.currentTimeMillis();
+		Sort.print(test);
 		Sort.quickSort(test, true);
+		Sort.print(test);
 		System.out.println(System.currentTimeMillis()-begin);
 
 		System.out.println("quick+insert:");
 		test=Arrays.copyOf(a, a.length);
 		begin=System.currentTimeMillis();
+		Sort.print(test);
 		Sort.quickSort(test, false);
+		Sort.print(test);
 		System.out.println(System.currentTimeMillis()-begin);
 
 		System.out.println("heap:");

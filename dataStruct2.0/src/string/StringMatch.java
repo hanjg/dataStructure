@@ -25,7 +25,7 @@ public class StringMatch {
 	
 	/**
 	 * 获得模式串的next数组,由next[j]=k递推得到next[j+1],next[0]=-1。
-	 * next[j]的值为模式串[0,j)子串最大前缀和后缀公共元素的长度（小于j）
+	 * next[j]的值为模式串[0,j)真子串最大前缀和后缀公共元素的长度（小于j）
 	 * @param p
 	 * @return
 	 */

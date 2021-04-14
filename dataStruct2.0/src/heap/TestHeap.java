@@ -11,6 +11,18 @@ public class TestHeap {
 			list.add(i);
 		}
 		MinHeap<Integer> heap=new MinHeap<>(2*data.length, list);
-		heap.print();
+		while (!heap.isEmpty()) {
+			System.out.print(heap.poll()+",");
+		}
+		System.out.println();
+
+		Heap intHeap = new Heap(100);
+		for(int num : data) {
+			intHeap.add(num);
+		}
+		while (!intHeap.isEmpty()) {
+            System.out.print(intHeap.poll()+",");
+        }
+		
 	}
 }

@@ -272,7 +272,8 @@ public class DiGraph<E> implements Graph<E> {
 	} 
 	
 	/**
-	 * dijkstra算法求有向连通图源点v0到各个顶点的最短路径
+	 * dijkstra算法求有向连通图源点v0到各个顶点的最短路径<p>
+	 * 每次寻找离V0最近的未找到最短路径的节点
 	 * @return 最短路径信息：从v0开始到各个顶点的最短路径上的所有下标
 	 */
 	public List<List<E>> dijkstra(int v0){
@@ -315,6 +316,16 @@ public class DiGraph<E> implements Graph<E> {
 		
 		//转换形式
 		List<List<E>> res=new SeqList<>(numberOfVertice());
+		transformSections(sections, res);
+		
+		return res;
+	}
+	/**
+	 * 将最短路径信息转化为最短路径上点的列表
+	 * @param sections
+	 * @param res
+	 */
+	private void transformSections(Section[] sections, List<List<E>> res) {
 		for(int i=0;i<numberOfVertice();i++){
 			List<E> temp=new SeqList<>();
 			if (sections[i].distance!=MAX_WEIGHT) {
@@ -325,19 +336,57 @@ public class DiGraph<E> implements Graph<E> {
 			}
 			//将v0为终点的路径反向输出为v0为起点的路径
 			List<E> path=new SeqList<>();
-			try {
-				for(int j=temp.size()-1;j>=0;j--){
-					path.add(temp.get(j));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			for(int j=temp.size()-1;j>=0;j--){
+				path.add(temp.get(j));
 			}
 			res.add(path);
 		}
+	}
+	
+	public List<List<E>> bellmanFord(int v0) {
+		Section[] sections=new Section[numberOfVertice()];
+		for (int i=0;i<sections.length;i++) {
+			if (i==v0) {
+				sections[i]=new Section(false, -1, 0);
+			}else {
+				sections[i]=new Section(false, v0, getWeight(v0, i));
+			}
+		}
+		//每条边松弛操作
+		for (int i=0;i<numberOfVertice();i++) {
+			for (int tail=0;tail<numberOfVertice();tail++) {
+				List<Integer> neighbours=getNeighbours(tail);
+				for (int k=0;k<neighbours.size();k++) {
+					int head=neighbours.get(k);
+					if (sections[tail].distance!=MAX_WEIGHT) {//v0到tail有路
+						//边tail->head
+						double distance=getWeight(tail, head);
+						if (sections[tail].distance+distance<sections[head].distance) {
+							sections[head].distance=sections[tail].distance+distance;
+							sections[head].pre=tail;
+						}
+					}
+				}
+			}
+		}
+
+		List<List<E>> res=new SeqList<>(numberOfVertice());
+		
+		//检查是否有负权回路
+		for (int j=0;j<numberOfVertice();j++) {
+			List<Integer> neighbours=getNeighbours(j);
+			for (int k=0;k<neighbours.size();k++) {
+				if (sections[j].distance!=MAX_WEIGHT) {
+					if (sections[j].distance+getWeight(j, k)<sections[k].distance) {
+						return res;
+					}
+				}
+			}
+		}
+		transformSections(sections, res);
 		
 		return res;
 	}
-	
 	/**
 	 * floyd算法计算有向连通图所有节点之间最短路径（可包括负值的权重）
 	 * @return i-j的最短路径下标
@@ -369,17 +418,14 @@ public class DiGraph<E> implements Graph<E> {
 					path.add(getVertex(i));
 				}else {
 					getPath(i, j, paths, path);
-					try {
-						if (path.size()==0&&getWeight(i, j)!=MAX_WEIGHT) {
-							path.add(getVertex(i));
-							path.add(getVertex(j));
-						}else if (path.size()!=0) {
-							path.add(0,getVertex(i));
-							path.add(getVertex(j));
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
+					if (path.size()==0&&getWeight(i, j)!=MAX_WEIGHT) {
+						path.add(getVertex(i));
+						path.add(getVertex(j));
+					}else if (path.size()!=0) {
+						path.add(0,getVertex(i));
+						path.add(getVertex(j));
 					}
+				
 				}
 				temp.add(path);
 			}
@@ -426,7 +472,7 @@ public class DiGraph<E> implements Graph<E> {
 		}
 	}
 	/**
-	 * dijkstra中储存路段信息
+	 * dijkstra,bellmanFord中储存路段信息
 	 * @author hjg
 	 *
 	 */
@@ -466,8 +512,9 @@ public class DiGraph<E> implements Graph<E> {
 	public static void main(String[] args) {
 		double i=Double.MAX_VALUE;
 		System.out.println(i);
-		i+=1;
+		i+=Double.MAX_VALUE/10;
 		System.out.println(i);
 		System.out.println(i>Double.MAX_VALUE);
+		System.out.println(i==Double.MAX_VALUE);
 	}
 }
